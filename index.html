@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Empresarial - Gestão de Funcionários</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li a:hover, nav ul li a.active {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        main {
+            padding: 2rem 0;
+            min-height: calc(100vh - 140px);
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .page-title {
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        button.danger {
+            background-color: var(--accent-color);
+        }
+        
+        button.danger:hover {
+            background-color: #c0392b;
+        }
+        
+        button.warning {
+            background-color: var(--warning-color);
+        }
+        
+        button.warning:hover {
+            background-color: #e67e22;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .actions button {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+        
+        .alert {
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert.success {
+            background-color: rgba(46, 204, 113, 0.2);
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .alert.error {
+            background-color: rgba(231, 76, 60, 0.2);
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-color);
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+            
+            nav ul li {
+                margin: 0 0.5rem;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">EmpresaXYZ - Sistema de Gestão</div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-page="dashboard">Dashboard</a></li>
+                        <li><a href="#" class="nav-link" data-page="funcionarios">Funcionários</a></li>
+                        <li><a href="#" class="nav-link" data-page="departamentos">Departamentos</a></li>
+                        <li><a href="#" class="nav-link" data-page="relatorios">Relatórios</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <div class="container">
+            <!-- Dashboard -->
+            <section id="dashboard" class="page active">
+                <h2 class="page-title">Dashboard</h2>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Total de Funcionários</div>
+                        <div class="stat-value" id="total-funcionarios">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Departamentos</div>
+                        <div class="stat-value" id="total-departamentos">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Salário Médio</div>
+                        <div class="stat-value" id="salario-medio">R$ 0,00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Funcionários Ativos</div>
+                        <div class="stat-value" id="funcionarios-ativos">0</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Funcionários Recentes</h3>
+                    <table id="recent-employees">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Departamento</th>
+                                <th>Cargo</th>
+                                <th>Data de Admissão</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão preenchidos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Funcionários -->
+            <section id="funcionarios" class="page">
+                <h2 class="page-title">Gestão de Funcionários</h2>
+                
+                <div class="card">
+                    <h3>Adicionar/Editar Funcionário</h3>
+                    <form id="form-funcionario">
+                        <input type="hidden" id="funcionario-id">
+                        <div class="form-group">
+                            <label for="nome">Nome Completo</label>
+                            <input type="text" id="nome" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">E-mail</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cargo">Cargo</label>
+                            <input type="text" id="cargo" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="departamento">Departamento</label>
+                            <select id="departamento" required>
+                                <option value="">Selecione um departamento</option>
+                                <!-- Opções serão preenchidas via JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="salario">Salário (R$)</label>
+                            <input type="number" id="salario" step="0.01" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="data-admissao">Data de Admissão</label>
+                            <input type="date" id="data-admissao" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" required>
+                                <option value="true">Ativo</option>
+                                <option value="false">Inativo</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" id="btn-submit-funcionario">Adicionar Funcionário</button>
+                        <button type="button" id="btn-cancelar-funcionario" style="display: none;">Cancelar Edição</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3>Lista de Funcionários</h3>
+                    <table id="tabela-funcionarios">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Cargo</th>
+                                <th>Departamento</th>
+                                <th>Salário</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão preenchidos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Departamentos -->
+            <section id="departamentos" class="page">
+                <h2 class="page-title">Gestão de Departamentos</h2>
+                
+                <div class="card">
+                    <h3>Adicionar/Editar Departamento</h3>
+                    <form id="form-departamento">
+                        <input type="hidden" id="departamento-id">
+                        <div class="form-group">
+                            <label for="nome-departamento">Nome do Departamento</label>
+                            <input type="text" id="nome-departamento" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="descricao">Descrição</label>
+                            <input type="text" id="descricao">
+                        </div>
+                        
+                        <button type="submit" id="btn-submit-departamento">Adicionar Departamento</button>
+                        <button type="button" id="btn-cancelar-departamento" style="display: none;">Cancelar Edição</button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h3>Lista de Departamentos</h3>
+                    <table id="tabela-departamentos">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Nº de Funcionários</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão preenchidos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Relatórios -->
+            <section id="relatorios" class="page">
+                <h2 class="page-title">Relatórios</h2>
+                
+                <div class="card">
+                    <h3>Funcionários por Departamento</h3>
+                    <div class="chart-container">
+                        <canvas id="chart-departamentos"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Distribuição Salarial</h3>
+                    <div class="chart-container">
+                        <canvas id="chart-salarios"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>Status dos Funcionários</h3>
+                    <div class="chart-container">
+                        <canvas id="chart-status"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- Modal de Confirmação -->
+    <div class="modal" id="modal-confirmacao">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmação</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <p id="modal-message">Tem certeza que deseja excluir este item?</p>
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button id="modal-confirm" class="danger">Confirmar</button>
+                <button id="modal-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Sistema Empresarial &copy; 2023 - Todos os direitos reservados</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simulação de banco de dados usando localStorage
+        class Database {
+            constructor() {
+                this.initializeDatabase();
+            }
+            
+            initializeDatabase() {
+                // Inicializar dados se não existirem
+                if (!localStorage.getItem('funcionarios')) {
+                    localStorage.setItem('funcionarios', JSON.stringify([]));
+                }
+                
+                if (!localStorage.getItem('departamentos')) {
+                    // Departamentos padrão
+                    const departamentos = [
+                        { id: 1, nome: 'TI', descricao: 'Tecnologia da Informação' },
+                        { id: 2, nome: 'RH', descricao: 'Recursos Humanos' },
+                        { id: 3, nome: 'Vendas', descricao: 'Departamento Comercial' },
+                        { id: 4, nome: 'Financeiro', descricao: 'Departamento Financeiro' }
+                    ];
+                    localStorage.setItem('departamentos', JSON.stringify(departamentos));
+                }
+            }
+            
+            // Operações para Funcionários
+            getFuncionarios() {
+                return JSON.parse(localStorage.getItem('funcionarios')) || [];
+            }
+            
+            addFuncionario(funcionario) {
+                const funcionarios = this.getFuncionarios();
+                // Gerar ID único
+                funcionario.id = funcionarios.length > 0 ? Math.max(...funcionarios.map(f => f.id)) + 1 : 1;
+                funcionarios.push(funcionario);
+                localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+                return funcionario.id;
+            }
+            
+            updateFuncionario(id, dadosAtualizados) {
+                const funcionarios = this.getFuncionarios();
+                const index = funcionarios.findIndex(f => f.id === id);
+                if (index !== -1) {
+                    funcionarios[index] = { ...funcionarios[index], ...dadosAtualizados };
+                    localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+                    return true;
+                }
+                return false;
+            }
+            
+            deleteFuncionario(id) {
+                const funcionarios = this.getFuncionarios();
+                const index = funcionarios.findIndex(f => f.id === id);
+                if (index !== -1) {
+                    funcionarios.splice(index, 1);
+                    localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+                    return true;
+                }
+                return false;
+            }
+            
+            // Operações para Departamentos
+            getDepartamentos() {
+                return JSON.parse(localStorage.getItem('departamentos')) || [];
+            }
+            
+            addDepartamento(departamento) {
+                const departamentos = this.getDepartamentos();
+                // Gerar ID único
+                departamento.id = departamentos.length > 0 ? Math.max(...departamentos.map(d => d.id)) + 1 : 1;
+                departamentos.push(departamento);
+                localStorage.setItem('departamentos', JSON.stringify(departamentos));
+                return departamento.id;
+            }
+            
+            updateDepartamento(id, dadosAtualizados) {
+                const departamentos = this.getDepartamentos();
+                const index = departamentos.findIndex(d => d.id === id);
+                if (index !== -1) {
+                    departamentos[index] = { ...departamentos[index], ...dadosAtualizados };
+                    localStorage.setItem('departamentos', JSON.stringify(departamentos));
+                    return true;
+                }
+                return false;
+            }
+            
+            deleteDepartamento(id) {
+                const departamentos = this.getDepartamentos();
+                const funcionarios = this.getFuncionarios();
+                
+                // Verificar se há funcionários no departamento
+                const funcionariosNoDepartamento = funcionarios.filter(f => f.departamentoId === id);
+                if (funcionariosNoDepartamento.length > 0) {
+                    return false; // Não pode excluir departamento com funcionários
+                }
+                
+                const index = departamentos.findIndex(d => d.id === id);
+                if (index !== -1) {
+                    departamentos.splice(index, 1);
+                    localStorage.setItem('departamentos', JSON.stringify(departamentos));
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        // Sistema de Navegação
+        class Navigation {
+            constructor() {
+                this.currentPage = 'dashboard';
+                this.init();
+            }
+            
+            init() {
+                // Adicionar event listeners para os links de navegação
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.navigateTo(link.dataset.page);
+                    });
+                });
+            }
+            
+            navigateTo(page) {
+                // Atualizar navegação ativa
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+                document.querySelector(`[data-page="${page}"]`).classList.add('active');
+                
+                // Mostrar página correspondente
+                document.querySelectorAll('.page').forEach(pageElement => {
+                    pageElement.classList.remove('active');
+                });
+                document.getElementById(page).classList.add('active');
+                
+                this.currentPage = page;
+                
+                // Atualizar dados específicos da página
+                if (page === 'dashboard') {
+                    app.updateDashboard();
+                } else if (page === 'funcionarios') {
+                    app.updateFuncionariosList();
+                } else if (page === 'departamentos') {
+                    app.updateDepartamentosList();
+                } else if (page === 'relatorios') {
+                    app.updateRelatorios();
+                }
+            }
+        }
+
+        // Aplicação principal
+        class App {
+            constructor() {
+                this.db = new Database();
+                this.navigation = new Navigation();
+                this.editingFuncionarioId = null;
+                this.editingDepartamentoId = null;
+                this.charts = {};
+                this.init();
+            }
+            
+            init() {
+                // Inicializar formulários
+                this.initForms();
+                
+                // Inicializar modal
+                this.initModal();
+                
+                // Carregar dados iniciais
+                this.updateDashboard();
+                this.updateFuncionariosList();
+                this.updateDepartamentosList();
+                this.populateDepartamentoSelect();
+            }
+            
+            initForms() {
+                // Formulário de funcionário
+                document.getElementById('form-funcionario').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (this.editingFuncionarioId) {
+                        this.updateFuncionario();
+                    } else {
+                        this.addFuncionario();
+                    }
+                });
+                
+                // Botão cancelar edição de funcionário
+                document.getElementById('btn-cancelar-funcionario').addEventListener('click', () => {
+                    this.cancelEditFuncionario();
+                });
+                
+                // Formulário de departamento
+                document.getElementById('form-departamento').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (this.editingDepartamentoId) {
+                        this.updateDepartamento();
+                    } else {
+                        this.addDepartamento();
+                    }
+                });
+                
+                // Botão cancelar edição de departamento
+                document.getElementById('btn-cancelar-departamento').addEventListener('click', () => {
+                    this.cancelEditDepartamento();
+                });
+            }
+            
+            initModal() {
+                const modal = document.getElementById('modal-confirmacao');
+                const closeModal = document.querySelector('.close-modal');
+                const cancelBtn = document.getElementById('modal-cancel');
+                
+                closeModal.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                });
+                
+                cancelBtn.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                });
+                
+                // Fechar modal ao clicar fora
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            }
+            
+            showModal(message, confirmCallback) {
+                document.getElementById('modal-message').textContent = message;
+                const modal = document.getElementById('modal-confirmacao');
+                const confirmBtn = document.getElementById('modal-confirm');
+                
+                // Remover event listeners anteriores
+                const newConfirmBtn = confirmBtn.cloneNode(true);
+                confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+                
+                newConfirmBtn.addEventListener('click', () => {
+                    confirmCallback();
+                    modal.classList.remove('active');
+                });
+                
+                modal.classList.add('active');
+            }
+            
+            populateDepartamentoSelect() {
+                const select = document.getElementById('departamento');
+                const departamentos = this.db.getDepartamentos();
+                
+                // Limpar opções existentes (exceto a primeira)
+                while (select.children.length > 1) {
+                    select.removeChild(select.lastChild);
+                }
+                
+                // Adicionar opções
+                departamentos.forEach(depto => {
+                    const option = document.createElement('option');
+                    option.value = depto.id;
+                    option.textContent = depto.nome;
+                    select.appendChild(option);
+                });
+            }
+            
+            addFuncionario() {
+                const funcionario = {
+                    nome: document.getElementById('nome').value,
+                    email: document.getElementById('email').value,
+                    cargo: document.getElementById('cargo').value,
+                    departamentoId: parseInt(document.getElementById('departamento').value),
+                    salario: parseFloat(document.getElementById('salario').value),
+                    dataAdmissao: document.getElementById('data-admissao').value,
+                    ativo: document.getElementById('status').value === 'true'
+                };
+                
+                this.db.addFuncionario(funcionario);
+                
+                // Limpar formulário
+                document.getElementById('form-funcionario').reset();
+                
+                // Atualizar listas
+                this.updateDashboard();
+                this.updateFuncionariosList();
+                
+                // Mostrar mensagem de sucesso
+                this.showAlert('Funcionário adicionado com sucesso!', 'success');
+            }
+            
+            editFuncionario(id) {
+                const funcionarios = this.db.getFuncionarios();
+                const funcionario = funcionarios.find(f => f.id === id);
+                
+                if (funcionario) {
+                    document.getElementById('funcionario-id').value = funcionario.id;
+                    document.getElementById('nome').value = funcionario.nome;
+                    document.getElementById('email').value = funcionario.email;
+                    document.getElementById('cargo').value = funcionario.cargo;
+                    document.getElementById('departamento').value = funcionario.departamentoId;
+                    document.getElementById('salario').value = funcionario.salario;
+                    document.getElementById('data-admissao').value = funcionario.dataAdmissao;
+                    document.getElementById('status').value = funcionario.ativo.toString();
+                    
+                    document.getElementById('btn-submit-funcionario').textContent = 'Atualizar Funcionário';
+                    document.getElementById('btn-cancelar-funcionario').style.display = 'inline-block';
+                    
+                    this.editingFuncionarioId = id;
+                }
+            }
+            
+            updateFuncionario() {
+                const funcionario = {
+                    nome: document.getElementById('nome').value,
+                    email: document.getElementById('email').value,
+                    cargo: document.getElementById('cargo').value,
+                    departamentoId: parseInt(document.getElementById('departamento').value),
+                    salario: parseFloat(document.getElementById('salario').value),
+                    dataAdmissao: document.getElementById('data-admissao').value,
+                    ativo: document.getElementById('status').value === 'true'
+                };
+                
+                if (this.db.updateFuncionario(this.editingFuncionarioId, funcionario)) {
+                    this.cancelEditFuncionario();
+                    this.updateDashboard();
+                    this.updateFuncionariosList();
+                    this.showAlert('Funcionário atualizado com sucesso!', 'success');
+                } else {
+                    this.showAlert('Erro ao atualizar funcionário.', 'error');
+                }
+            }
+            
+            cancelEditFuncionario() {
+                document.getElementById('form-funcionario').reset();
+                document.getElementById('btn-submit-funcionario').textContent = 'Adicionar Funcionário';
+                document.getElementById('btn-cancelar-funcionario').style.display = 'none';
+                this.editingFuncionarioId = null;
+            }
+            
+            addDepartamento() {
+                const departamento = {
+                    nome: document.getElementById('nome-departamento').value,
+                    descricao: document.getElementById('descricao').value
+                };
+                
+                this.db.addDepartamento(departamento);
+                
+                // Limpar formulário
+                document.getElementById('form-departamento').reset();
+                
+                // Atualizar listas
+                this.updateDashboard();
+                this.updateDepartamentosList();
+                this.populateDepartamentoSelect();
+                
+                // Mostrar mensagem de sucesso
+                this.showAlert('Departamento adicionado com sucesso!', 'success');
+            }
+            
+            editDepartamento(id) {
+                const departamentos = this.db.getDepartamentos();
+                const departamento = departamentos.find(d => d.id === id);
+                
+                if (departamento) {
+                    document.getElementById('departamento-id').value = departamento.id;
+                    document.getElementById('nome-departamento').value = departamento.nome;
+                    document.getElementById('descricao').value = departamento.descricao;
+                    
+                    document.getElementById('btn-submit-departamento').textContent = 'Atualizar Departamento';
+                    document.getElementById('btn-cancelar-departamento').style.display = 'inline-block';
+                    
+                    this.editingDepartamentoId = id;
+                }
+            }
+            
+            updateDepartamento() {
+                const departamento = {
+                    nome: document.getElementById('nome-departamento').value,
+                    descricao: document.getElementById('descricao').value
+                };
+                
+                if (this.db.updateDepartamento(this.editingDepartamentoId, departamento)) {
+                    this.cancelEditDepartamento();
+                    this.updateDashboard();
+                    this.updateDepartamentosList();
+                    this.populateDepartamentoSelect();
+                    this.showAlert('Departamento atualizado com sucesso!', 'success');
+                } else {
+                    this.showAlert('Erro ao atualizar departamento.', 'error');
+                }
+            }
+            
+            cancelEditDepartamento() {
+                document.getElementById('form-departamento').reset();
+                document.getElementById('btn-submit-departamento').textContent = 'Adicionar Departamento';
+                document.getElementById('btn-cancelar-departamento').style.display = 'none';
+                this.editingDepartamentoId = null;
+            }
+            
+            deleteFuncionario(id) {
+                this.showModal('Tem certeza que deseja excluir este funcionário?', () => {
+                    if (this.db.deleteFuncionario(id)) {
+                        this.updateDashboard();
+                        this.updateFuncionariosList();
+                        this.showAlert('Funcionário excluído com sucesso!', 'success');
+                    } else {
+                        this.showAlert('Erro ao excluir funcionário.', 'error');
+                    }
+                });
+            }
+            
+            deleteDepartamento(id) {
+                this.showModal('Tem certeza que deseja excluir este departamento?', () => {
+                    if (this.db.deleteDepartamento(id)) {
+                        this.updateDashboard();
+                        this.updateDepartamentosList();
+                        this.populateDepartamentoSelect();
+                        this.showAlert('Departamento excluído com sucesso!', 'success');
+                    } else {
+                        this.showAlert('Não é possível excluir um departamento que possui funcionários.', 'error');
+                    }
+                });
+            }
+            
+            updateDashboard() {
+                const funcionarios = this.db.getFuncionarios();
+                const departamentos = this.db.getDepartamentos();
+                
+                // Atualizar estatísticas
+                document.getElementById('total-funcionarios').textContent = funcionarios.length;
+                document.getElementById('total-departamentos').textContent = departamentos.length;
+                
+                // Calcular salário médio
+                const funcionariosAtivos = funcionarios.filter(f => f.ativo);
+                const salarioMedio = funcionariosAtivos.length > 0 ? 
+                    funcionariosAtivos.reduce((sum, f) => sum + f.salario, 0) / funcionariosAtivos.length : 0;
+                document.getElementById('salario-medio').textContent = 
+                    `R$ ${salarioMedio.toFixed(2)}`;
+                
+                // Contar funcionários ativos
+                const ativos = funcionarios.filter(f => f.ativo).length;
+                document.getElementById('funcionarios-ativos').textContent = ativos;
+                
+                // Atualizar tabela de funcionários recentes
+                this.updateRecentEmployeesTable();
+            }
+            
+            updateRecentEmployeesTable() {
+                const funcionarios = this.db.getFuncionarios();
+                const departamentos = this.db.getDepartamentos();
+                const tbody = document.querySelector('#recent-employees tbody');
+                
+                // Limpar tabela
+                tbody.innerHTML = '';
+                
+                // Ordenar por data de admissão (mais recentes primeiro) e pegar os 5 primeiros
+                const recentes = [...funcionarios]
+                    .sort((a, b) => new Date(b.dataAdmissao) - new Date(a.dataAdmissao))
+                    .slice(0, 5);
+                
+                // Preencher tabela
+                recentes.forEach(func => {
+                    const depto = departamentos.find(d => d.id === func.departamentoId);
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${func.id}</td>
+                        <td>${func.nome}</td>
+                        <td>${depto ? depto.nome : 'N/A'}</td>
+                        <td>${func.cargo}</td>
+                        <td>${new Date(func.dataAdmissao).toLocaleDateString('pt-BR')}</td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+            }
+            
+            updateFuncionariosList() {
+                const funcionarios = this.db.getFuncionarios();
+                const departamentos = this.db.getDepartamentos();
+                const tbody = document.querySelector('#tabela-funcionarios tbody');
+                
+                // Limpar tabela
+                tbody.innerHTML = '';
+                
+                // Preencher tabela
+                funcionarios.forEach(func => {
+                    const depto = departamentos.find(d => d.id === func.departamentoId);
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${func.id}</td>
+                        <td>${func.nome}</td>
+                        <td>${func.email}</td>
+                        <td>${func.cargo}</td>
+                        <td>${depto ? depto.nome : 'N/A'}</td>
+                        <td>R$ ${func.salario.toFixed(2)}</td>
+                        <td>${func.ativo ? 'Ativo' : 'Inativo'}</td>
+                        <td class="actions">
+                            <button class="warning" onclick="app.editFuncionario(${func.id})">Editar</button>
+                            <button class="danger" onclick="app.deleteFuncionario(${func.id})">Excluir</button>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+            }
+            
+            updateDepartamentosList() {
+                const departamentos = this.db.getDepartamentos();
+                const funcionarios = this.db.getFuncionarios();
+                const tbody = document.querySelector('#tabela-departamentos tbody');
+                
+                // Limpar tabela
+                tbody.innerHTML = '';
+                
+                // Preencher tabela
+                departamentos.forEach(depto => {
+                    const numFuncionarios = funcionarios.filter(f => f.departamentoId === depto.id).length;
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${depto.id}</td>
+                        <td>${depto.nome}</td>
+                        <td>${depto.descricao}</td>
+                        <td>${numFuncionarios}</td>
+                        <td class="actions">
+                            <button class="warning" onclick="app.editDepartamento(${depto.id})">Editar</button>
+                            <button class="danger" onclick="app.deleteDepartamento(${depto.id})">Excluir</button>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+            }
+            
+            updateRelatorios() {
+                const funcionarios = this.db.getFuncionarios();
+                const departamentos = this.db.getDepartamentos();
+                
+                // Gráfico de funcionários por departamento
+                const deptData = {};
+                departamentos.forEach(depto => {
+                    deptData[depto.nome] = funcionarios.filter(f => f.departamentoId === depto.id).length;
+                });
+                
+                this.createChart('chart-departamentos', {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(deptData),
+                        datasets: [{
+                            label: 'Funcionários por Departamento',
+                            data: Object.values(deptData),
+                            backgroundColor: [
+                                'rgba(52, 152, 219, 0.7)',
+                                'rgba(46, 204, 113, 0.7)',
+                                'rgba(155, 89, 182, 0.7)',
+                                'rgba(241, 196, 15, 0.7)',
+                                'rgba(230, 126, 34, 0.7)',
+                                'rgba(231, 76, 60, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgb(52, 152, 219)',
+                                'rgb(46, 204, 113)',
+                                'rgb(155, 89, 182)',
+                                'rgb(241, 196, 15)',
+                                'rgb(230, 126, 34)',
+                                'rgb(231, 76, 60)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // Gráfico de distribuição salarial
+                const salarios = funcionarios.map(f => f.salario);
+                const faixas = [0, 2000, 4000, 6000, 8000, 10000];
+                const contagemFaixas = new Array(faixas.length).fill(0);
+                
+                salarios.forEach(salario => {
+                    for (let i = 0; i < faixas.length; i++) {
+                        if (salario < faixas[i] || i === faixas.length - 1) {
+                            contagemFaixas[i]++;
+                            break;
+                        }
+                    }
+                });
+                
+                const labelsFaixas = faixas.map((faixa, i) => {
+                    if (i === 0) return `Até R$ ${faixas[1].toFixed(2)}`;
+                    if (i === faixas.length - 1) return `Acima de R$ ${faixas[i].toFixed(2)}`;
+                    return `R$ ${faixas[i].toFixed(2)} - R$ ${faixas[i+1].toFixed(2)}`;
+                });
+                
+                this.createChart('chart-salarios', {
+                    type: 'pie',
+                    data: {
+                        labels: labelsFaixas,
+                        datasets: [{
+                            label: 'Distribuição Salarial',
+                            data: contagemFaixas,
+                            backgroundColor: [
+                                'rgba(52, 152, 219, 0.7)',
+                                'rgba(46, 204, 113, 0.7)',
+                                'rgba(155, 89, 182, 0.7)',
+                                'rgba(241, 196, 15, 0.7)',
+                                'rgba(230, 126, 34, 0.7)',
+                                'rgba(231, 76, 60, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgb(52, 152, 219)',
+                                'rgb(46, 204, 113)',
+                                'rgb(155, 89, 182)',
+                                'rgb(241, 196, 15)',
+                                'rgb(230, 126, 34)',
+                                'rgb(231, 76, 60)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+                
+                // Gráfico de status dos funcionários
+                const ativos = funcionarios.filter(f => f.ativo).length;
+                const inativos = funcionarios.length - ativos;
+                
+                this.createChart('chart-status', {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Ativos', 'Inativos'],
+                        datasets: [{
+                            label: 'Status dos Funcionários',
+                            data: [ativos, inativos],
+                            backgroundColor: [
+                                'rgba(46, 204, 113, 0.7)',
+                                'rgba(231, 76, 60, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgb(46, 204, 113)',
+                                'rgb(231, 76, 60)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+            
+            createChart(canvasId, config) {
+                const canvas = document.getElementById(canvasId);
+                const ctx = canvas.getContext('2d');
+                
+                // Destruir gráfico anterior se existir
+                if (this.charts[canvasId]) {
+                    this.charts[canvasId].destroy();
+                }
+                
+                // Criar novo gráfico
+                this.charts[canvasId] = new Chart(ctx, config);
+            }
+            
+            showAlert(message, type) {
+                // Criar elemento de alerta
+                const alert = document.createElement('div');
+                alert.className = `alert ${type}`;
+                alert.textContent = message;
+                
+                // Inserir no início do main
+                const main = document.querySelector('main .container');
+                main.insertBefore(alert, main.firstChild);
+                
+                // Remover após 3 segundos
+                setTimeout(() => {
+                    alert.remove();
+                }, 3000);
+            }
+        }
+
+        // Inicializar a aplicação quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', () => {
+            window.app = new App();
+        });
+    </script>
+</body>
+</html>
